@@ -13,7 +13,7 @@
 
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import type { Database } from "@types/database.type";
+import type { Database } from "../../types/database.types";
 
 /**
  * Crea un cliente Supabase configurado para uso en el servidor.

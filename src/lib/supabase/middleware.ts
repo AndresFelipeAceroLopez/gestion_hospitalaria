@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import type { NextRequest, NextResponse } from "next/server";
-import type { Database } from "@types/database.type";
+import type { Database } from "../../types/database.types";
 
 /**
  * Crea el cliente Supabase para el middleware.

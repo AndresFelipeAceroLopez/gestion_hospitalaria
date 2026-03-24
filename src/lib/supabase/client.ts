@@ -9,7 +9,7 @@
  */
 
 import { createBrowserClient } from "@supabase/ssr";
-import type { Database } from "@types/database.type";
+import type { Database } from "../../types/database.types";
 
 /**
  * Crea un cliente Supabase para uso en el navegador.
