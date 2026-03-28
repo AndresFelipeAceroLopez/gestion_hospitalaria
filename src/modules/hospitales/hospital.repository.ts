@@ -137,7 +137,7 @@ implements
 
     private mapToDomain(row: any): Hospital {
       return {
-        hospitalId: Number(row.hospitalid),
+        hospitalId: row.hospitalid ?? 0,
         nombre: row.nombre || "",
         direccion: row.direccion || "",
         nit: row.nit || "",

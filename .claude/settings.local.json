@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__ide__getDiagnostics",
+      "Bash(find /c/Users/maria/gestion_hospitalaria/node_modules/next/dist/docs -name *.md)",
+      "Bash(for f:*)",
+      "Bash(do)",
+      "Bash(sed -i '1s/^/\"\"use client\"\";\\\\n\\\\n/' \"/c/Users/maria/gestion_hospitalaria/$f\")",
+      "Bash(echo \"Fixed: $f\")",
+      "Bash(done)",
+      "Bash(ls /c/Users/maria/gestion_hospitalaria/.env*)",
+      "Bash(xargs grep:*)",
+      "Bash(find /c/Users/maria/gestion_hospitalaria/src/modules/especialidades -name *.ts)",
+      "Bash(xargs ls:*)",
+      "Bash(grep -v \"^d.*\\\\.$\")",
+      "Bash(xargs wc:*)",
+      "Bash(grep -r RealtimeVisitasDashboard /c/Users/maria/gestion_hospitalaria/src --include=*.tsx --include=*.ts)"
+    ]
+  }
+}

@@ -123,22 +123,22 @@ implements
       const vi = tr?.visitas;
 
       const tratamiento: TratamientoConRelaciones = {
-        tratamientoId: Number(tr?.tratamientoid),
-        visitaId: Number(tr?.visitaid),
+        tratamientoId: tr?.tratamientoid ?? 0,
+        visitaId: tr?.visitaid ?? 0,
         fechaInicio: tr?.fechainicio || "",
         fechaFin: tr?.fechafin || "",
         visita: {
-            visitaId: Number(vi?.visitaid),
-            pacienteId: Number(vi?.pacienteid),
-            medicoId: Number(vi?.medicoid),
+            visitaId: vi?.visitaid ?? 0,
+            pacienteId: vi?.pacienteid ?? 0,
+            medicoId: vi?.medicoid ?? 0,
             fecha: vi?.fecha || "",
             hora: vi?.hora || "",
         }
       };
 
       return {
-        formulaId: Number(row.formulaid),
-        tratamientoId: Number(row.tratamientoid),
+        formulaId: row.formulaid ?? 0,
+        tratamientoId: row.tratamientoid ?? 0,
         fecha: row.fecha || "",
         tratamiento
       };

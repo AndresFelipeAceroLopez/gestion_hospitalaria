@@ -129,14 +129,14 @@ implements
     private mapToDomain(row: any): TratamientoConRelaciones {
       const vi = row.visitas;
       return {
-        tratamientoId: Number(row.tratamientoid),
-        visitaId: Number(row.visitaid),
+        tratamientoId: row.tratamientoid ?? 0,
+        visitaId: row.visitaid ?? 0,
         fechaInicio: row.fechainicio || "",
         fechaFin: row.fechafin || "",
         visita: vi ? {
-          visitaId: Number(vi.visitaid),
-          pacienteId: Number(vi.pacienteid),
-          medicoId: Number(vi.medicoid),
+          visitaId: vi.visitaid ?? 0,
+          pacienteId: vi.pacienteid ?? 0,
+          medicoId: vi.medicoid ?? 0,
           fecha: vi.fecha || "",
           hora: vi.hora || "",
         } : undefined as any

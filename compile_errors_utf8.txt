@@ -1,5 +1,0 @@
-﻿src/modules/incapacidades/incapacidad.repository.ts(87,10): error TS2769: No overload matches this call.
-  Overload 1 of 2, '(values: { fecha: string; incapacidadid?: number | undefined; tratamientoid: number; }, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "14.4"; }, ... 5 more ..., "POST">', gave the following error.
-    Object literal may only specify known properties, and 'fechainicio' does not exist in type '{ fecha: string; incapacidadid?: number | undefined; tratamientoid: number; }'.
-  Overload 2 of 2, '(values: { fecha: string; incapacidadid?: number | undefined; tratamientoid: number; }[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<...>', gave the following error.
-    Object literal may only specify known properties, and 'tratamientoid' does not exist in type '{ fecha: string; incapacidadid?: number | undefined; tratamientoid: number; }[]'.

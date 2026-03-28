@@ -8,8 +8,8 @@ import type { Medico } from "../medicos/types";
 
 export interface Visita {
   visitaId: number;
-  pacienteId: number;
-  medicoId: number;
+  pacienteId: string; // UUID
+  medicoId: string;   // UUID
   fecha: string; // "YYYY-MM-DD"
   hora: string; // "HH:MM"
 }
