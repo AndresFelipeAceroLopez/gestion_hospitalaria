@@ -1,28 +1,31 @@
 /**
  * @file src/modules/visitas/types.ts
- * @description Tipos para el modulo de Visitas (el mas complejo del sistema)
+ * @description Tipos para el modulo de Visitas
  */
 
+import type { Paciente } from "../pacientes/types";
+import type { Medico } from "../medicos/types";
+
 export interface Visita {
-  visitald: number;
-  pacienteld: number;
-  medicold: number;
+  visitaId: number;
+  pacienteId: number;
+  medicoId: number;
   fecha: string; // "YYYY-MM-DD"
   hora: string; // "HH:MM"
 }
 
 export interface DetalleVisita {
-  detalleVisitId: number;
-  visitId: number;
-  motiVolId: number;
+  detalleVisitaId: number;
+  visitaId: number;
+  motivoId: number;
   diagnostico: string;
 }
 
 export interface SignoVital {
   signoVitalId: number;
-  visitId: number;
+  visitaId: number;
   frecuenciaCardiaca: number;
-  presionArterial: string; // Ej: "120/80"
+  presionArterial: string;
   frecuenciaRespiratoria: number;
   temperatura: number;
   saturacionOxigeno: number;
@@ -33,19 +36,20 @@ export interface VisitaComplete extends Visita {
   paciente: { nombre: string; apellido: string; telefono: string };
   medico: { nombre: string; apellido: string; especialidad: string };
   detalle?: DetalleVisita & { motivoDescripcion: string };
-  signosVitales?: Omit<SignoVital, "signoVitalId" | "visitId">;
+  signosVitales?: Omit<SignoVital, "signoVitalId" | "visitaId">;
 }
 
-/** DTO para registrar una nueva visita completa */
-export interface CreateVisitaCompleteDTO {
-  pacientId: number;
-  medicId: number;
-  fecha: string;
-  hora: string;
-  // Datos adicionales de la visita (opcionales al crear)
-  motiVolId: number;
-  diagnostico: string;
-  signosVitales?: {
-    frecuenciaCardiaca: number;
-  }[];
+/** Visita con relaciones de dominio completas */
+export interface VisitaConRelaciones extends Visita {
+  paciente: Paciente;
+  medico: Medico;
+}
+
+export type CreateVisitaDTO = Omit<Visita, "visitaId">;
+export type UpdateVisitaDTO = Partial<CreateVisitaDTO>;
+
+export interface VisitaFilters {
+  pacienteId?: number;
+  medicoId?: number;
+  fecha?: string;
 }
