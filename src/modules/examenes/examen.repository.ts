@@ -126,13 +126,13 @@ implements
     private mapToDomain(row: any): OrdenExamenConRelaciones {
       const vi = row.visitas;
       return {
-        ordenExamenId: Number(row.ordenexamenid),
-        visitaId: Number(row.visitaid),
+        ordenExamenId: row.ordenexamenid ?? 0,
+        visitaId: row.visitaid ?? 0,
         fecha: row.fecha || "",
         visita: vi ? {
-          visitaId: Number(vi.visitaid),
-          pacienteId: Number(vi.pacienteid),
-          medicoId: Number(vi.medicoid),
+          visitaId: vi.visitaid ?? 0,
+          pacienteId: vi.pacienteid ?? 0,
+          medicoId: vi.medicoid ?? 0,
           fecha: vi.fecha || "",
           hora: vi.hora || "",
         } : undefined as any

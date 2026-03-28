@@ -115,7 +115,7 @@ implements
 
     private mapToDomain(row: any): Especialidad {
       return {
-        especialidadId: Number(row.especialidadid),
+        especialidadId: row.especialidadid ?? 0,
         nombre: row.nombre || "",
       };
     }

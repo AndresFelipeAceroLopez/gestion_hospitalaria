@@ -151,7 +151,7 @@ implements
 
     private mapToDomain(row: any): Paciente {
       return {
-        pacienteId: Number(row.pacienteid),
+        pacienteId: row.pacienteid ?? 0,
         nombre: row.nombre || "",
         apellido: row.apellido || "",
         fechaNacimiento: row.fechanacimiento || "",

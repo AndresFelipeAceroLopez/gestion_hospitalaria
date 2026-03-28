@@ -15,8 +15,7 @@ import type { TratamientoConRelaciones } from "../tratamientos/types";
 const INCAPACIDAD_SELECT = `
   incapacidadid,
   tratamientoid,
-  fechainicio,
-  fechafin,
+  fecha,
   tratamientos!tratamientoid(
     tratamientoid,
     fechainicio,
@@ -51,7 +50,7 @@ implements
 
     async findAll(filters?: IncapacidadFilters): Promise<IncapacidadConRelaciones[]> {
       const supabase = await createServerSupabaseClient();
-      let query = supabase.from("incapacidades").select(INCAPACIDAD_SELECT).order("fechainicio", { ascending: false });
+      let query = supabase.from("incapacidades").select(INCAPACIDAD_SELECT).order("fecha", { ascending: false });
 
       if (filters?.tratamientoId) query = query.eq("tratamientoid", filters.tratamientoId);
 
@@ -66,9 +65,7 @@ implements
         .insert({
           tratamientoid: dto.tratamientoId,
           fecha: dto.fecha,
-          fechainicio: (dto as any).fechaInicio || dto.fecha,
-          fechafin: (dto as any).fechaFin || dto.fecha
-        } as any)
+        })
         .select(INCAPACIDAD_SELECT)
         .single();
 
@@ -105,7 +102,7 @@ implements
       const from = (page - 1) * pageSize;
       const to = from + pageSize - 1;
 
-      let query = supabase.from("incapacidades").select(INCAPACIDAD_SELECT, { count: "exact" }).range(from, to).order("fechainicio", { ascending: false });
+      let query = supabase.from("incapacidades").select(INCAPACIDAD_SELECT, { count: "exact" }).range(from, to).order("fecha", { ascending: false });
       
       const { data, error, count } = await query;
       if (error) throw new Error(error.message);
@@ -125,23 +122,23 @@ implements
       const vi = tr?.visitas;
 
       const tratamiento: TratamientoConRelaciones = {
-        tratamientoId: Number(tr?.tratamientoid),
-        visitaId: Number(tr?.visitaid),
+        tratamientoId: tr?.tratamientoid ?? 0,
+        visitaId: tr?.visitaid ?? 0,
         fechaInicio: tr?.fechainicio || "",
         fechaFin: tr?.fechafin || "",
         visita: {
-            visitaId: Number(vi?.visitaid),
-            pacienteId: Number(vi?.pacienteid),
-            medicoId: Number(vi?.medicoid),
+            visitaId: vi?.visitaid ?? 0,
+            pacienteId: vi?.pacienteid ?? 0,
+            medicoId: vi?.medicoid ?? 0,
             fecha: vi?.fecha || "",
             hora: vi?.hora || "",
         }
       };
 
       return {
-        incapacidadId: Number(row.incapacidadid),
+        incapacidadId: row.incapacidadid ?? 0,
         fecha: row.fechainicio || row.fecha || "",
-        tratamientoId: Number(row.tratamientoid),
+        tratamientoId: row.tratamientoid ?? 0,
         tratamiento
       };
     }

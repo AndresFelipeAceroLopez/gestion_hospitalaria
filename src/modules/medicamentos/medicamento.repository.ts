@@ -137,10 +137,10 @@ implements
 
     private mapToDomain(row: any): Medicamento {
       return {
-        medicamentoId: Number(row.medicamentoid),
+        medicamentoId: row.medicamentoid ?? 0,
         nombre: row.nombre || "",
         descripcion: row.descripcion || "",
-        cantidad: Number(row.cantidad || 0),
+        cantidad: row.cantidad ?? 0,
         prescripcion: row.prescripcion || "",
         unidades: row.unidades || ""
       };
