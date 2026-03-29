@@ -27,7 +27,7 @@ export function ExamenesTable({ examenes }: Props) {
               <td className="px-4 py-3 text-gray-600">{examen.visitaId}</td>
               <td className="px-4 py-3 text-gray-600">{formatDate(examen.fecha)}</td>
               <td className="px-4 py-3 text-right">
-                <form action={deleteOrdenExamenAction.bind(null, null)}>
+                <form action={deleteOrdenExamenAction.bind}>
                   <input type="hidden" name="ordenExamenId" value={examen.ordenExamenId} />
                   <button
                     type="submit"
