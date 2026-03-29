@@ -29,7 +29,7 @@ export function TratamientosTable({ tratamientos }: Props) {
               <td className="px-4 py-3 text-gray-600">{formatDate(trat.fechaInicio)}</td>
               <td className="px-4 py-3 text-gray-600">{formatDate(trat.fechaFin)}</td>
               <td className="px-4 py-3 text-right">
-                <form action={deleteTratamientoAction.bind(null, null)}>
+                <form action={deleteTratamientoAction.bind}>
                   <input type="hidden" name="tratamientoId" value={trat.tratamientoId} />
                   <button
                     type="submit"

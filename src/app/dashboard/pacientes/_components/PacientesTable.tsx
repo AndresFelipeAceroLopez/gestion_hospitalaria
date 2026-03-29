@@ -35,7 +35,7 @@ export function PacientesTable({ pacientes }: Props) {
               <td className="px-4 py-3 text-gray-600">{pac.telefono}</td>
               <td className="px-4 py-3 text-gray-600">{pac.correoElectronico}</td>
               <td className="px-4 py-3 text-right">
-                <form action={deletePacienteAction.bind(null, null)}>
+                <form action={deletePacienteAction.bind}>
                   <input type="hidden" name="pacienteId" value={pac.pacienteId} />
                   <button
                     type="submit"

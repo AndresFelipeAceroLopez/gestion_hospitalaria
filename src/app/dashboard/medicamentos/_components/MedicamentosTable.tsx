@@ -31,7 +31,7 @@ export function MedicamentosTable({ medicamentos }: Props) {
               <td className="px-4 py-3 text-gray-600">{med.unidades}</td>
               <td className="px-4 py-3 text-gray-600">{truncate(med.prescripcion, 30)}</td>
               <td className="px-4 py-3 text-right">
-                <form action={deleteMedicamentoAction.bind(null, null)}>
+                <form action={deleteMedicamentoAction.bind}>
                   <input type="hidden" name="medicamentoId" value={med.medicamentoId} />
                   <button
                     type="submit"

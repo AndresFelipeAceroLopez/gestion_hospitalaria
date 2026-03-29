@@ -27,7 +27,7 @@ export function IncapacidadesTable({ incapacidades }: Props) {
               <td className="px-4 py-3 text-gray-600">{inc.tratamientoId}</td>
               <td className="px-4 py-3 text-gray-600">{formatDate(inc.fecha)}</td>
               <td className="px-4 py-3 text-right">
-                <form action={deleteIncapacidadAction.bind(null, null)}>
+                <form action={deleteIncapacidadAction.bind}>
                   <input type="hidden" name="incapacidadId" value={inc.incapacidadId} />
                   <button
                     type="submit"

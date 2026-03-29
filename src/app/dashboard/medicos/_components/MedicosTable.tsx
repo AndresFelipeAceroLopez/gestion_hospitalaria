@@ -33,7 +33,7 @@ export function MedicosTable({ medicos }: Props) {
               <td className="px-4 py-3 text-gray-600">{med.telefono}</td>
               <td className="px-4 py-3 text-gray-600">{med.correoElectronico}</td>
               <td className="px-4 py-3 text-right">
-                <form action={deleteMedicoAction.bind(null, null)}>
+                <form action={deleteMedicoAction.bind}>
                   <input type="hidden" name="medicoId" value={med.medicoId} />
                   <button
                     type="submit"
