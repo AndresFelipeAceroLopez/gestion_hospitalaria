@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { createHospitalAction, updateHospitalAction } from "../../../../modules/hospitales/hospital.actions";
 import type { Hospital } from "../../../../modules/hospitales/types";
 
 interface Props {
@@ -27,7 +28,21 @@ export function HospitalFormModal({ mode, hospital }: Props) {
               {mode === "create" ? "Nuevo Hospital" : "Editar Hospital"}
             </h2>
 
-            <form className="space-y-4">
+            <form
+              action={async (formData) => {
+                if (mode === "create") {
+                  await createHospitalAction(formData);
+                } else {
+                  await updateHospitalAction(formData);
+                }
+                setIsOpen(false);
+              }}
+              className="space-y-4"
+            >
+              {mode === "edit" && (
+                <input type="hidden" name="hospitalId" value={hospital?.hospitalId} />
+              )}
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Nombre *
@@ -49,6 +64,7 @@ export function HospitalFormModal({ mode, hospital }: Props) {
                   name="nit"
                   type="text"
                   required
+                  placeholder="800123456-7"
                   defaultValue={hospital?.nit}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
