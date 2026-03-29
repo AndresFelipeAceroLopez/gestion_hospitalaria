@@ -24,7 +24,7 @@ export function EspecialidadesTable({ especialidades }: Props) {
               <td className="px-4 py-3 text-gray-400 text-xs">{esp.especialidadId}</td>
               <td className="px-4 py-3 font-medium text-gray-900">{esp.nombre}</td>
               <td className="px-4 py-3 text-right">
-                <form action={deleteEspecialidadAction.bind(null, null)}>
+                <form action={deleteEspecialidadAction.bind}>
                   <input type="hidden" name="especialidadId" value={esp.especialidadId} />
                   <button
                     type="submit"
