@@ -101,7 +101,7 @@ export class HospitalService {
 
     async findByNombre(nombre: string): Promise<ServiceResult<Hospital[]>> {
         try {
-            const data = await this.repo.findAll({ nombre });
+            const data = await (this.repo as any).findByNombre(nombre);
             return { data, error: null, success: true };
         } catch (err) {
             return { data: null, error: this.handleError(err), success: false };
