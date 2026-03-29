@@ -1,8 +1,3 @@
-/**
- * @file src/modules/hospitales/hospital.actions.ts
- * @description Server Actions para operaciones de hospitales.
- */
-
 "use server";
 
 import { revalidatePath } from "next/cache";
@@ -14,24 +9,16 @@ import {
   updateHospitalSchema
 } from "./hospital.schema";
 
-// Instanciar con inyección de dependencias (DIP)
+// Instancias
 const hospitalRepo = new HospitalRepository();
 const hospitalService = new HospitalService(hospitalRepo);
 
-// Tipo para el estado del form (useActionState)
-type FormState = {
-  success: boolean;
-  message: string;
-  errors?: Record<string, string[]>;
-};
-
 /**
- * Crea un nuevo hospital desde un formulario HTML.
+ * ✅ CREATE (CORREGIDO)
  */
-export async function createHospitalAction(
-  _prevState: FormState | null,
-  formData: FormData
-): Promise<FormState> {
+export async function createHospitalAction(formData: FormData) {
+  console.log("ACTION CREATE EJECUTADA"); // 👈 debug
+
   const rawData = {
     nombre: formData.get("nombre") as string,
     direccion: formData.get("direccion") as string,
@@ -42,31 +29,34 @@ export async function createHospitalAction(
   const validation = createHospitalSchema.safeParse(rawData);
 
   if (!validation.success) {
-    return {
-      success: false,
-      message: "Por favor corrija los errores del formulario",
-      errors: validation.error.flatten().fieldErrors,
-    };
+    console.log("VALIDATION ERROR:", validation.error);
+    return;
   }
 
   const result = await hospitalService.create(validation.data);
 
   if (!result.success) {
-    return { success: false, message: result.error || "Error desconocido" };
+    console.log("SERVICE ERROR:", result.error);
+    return;
   }
+
+  console.log("HOSPITAL CREADO:", result.data);
 
   revalidatePath("/dashboard/hospitales");
   redirect("/dashboard/hospitales");
 }
 
 /**
- * Actualiza un hospital existente.
+ * ✅ UPDATE (CORREGIDO)
  */
-export async function updateHospitalAction(
-  _prevState: FormState | null,
-  formData: FormData
-): Promise<FormState> {
+export async function updateHospitalAction(formData: FormData) {
   const id = Number(formData.get("hospitalId"));
+
+  if (!id || isNaN(id)) {
+    console.log("ID inválido");
+    return;
+  }
+
   const rawData = {
     hospitalId: id,
     nombre: formData.get("nombre") as string,
@@ -75,68 +65,52 @@ export async function updateHospitalAction(
     telefono: formData.get("telefono") as string,
   };
 
-  if (isNaN(id) || id <= 0) {
-    return {
-      success: false,
-      message: "ID inválido",
-      errors: { hospitalId: ["El ID del hospital es inválido"] },
-    };
-  }
-
   const validation = updateHospitalSchema.safeParse(rawData);
 
   if (!validation.success) {
-    return {
-      success: false,
-      message: "Por favor corrija los errores del formulario",
-      errors: validation.error.flatten().fieldErrors,
-    };
+    console.log("VALIDATION ERROR:", validation.error);
+    return;
   }
 
   const result = await hospitalService.update(id, validation.data);
 
   if (!result.success) {
-    return { success: false, message: result.error || "Error desconocido" };
+    console.log("SERVICE ERROR:", result.error);
+    return;
   }
 
   revalidatePath("/dashboard/hospitales");
-  revalidatePath(`/dashboard/hospitales/${id}`);
   redirect("/dashboard/hospitales");
 }
 
 /**
- * Elimina un hospital por ID.
+ * ✅ DELETE (CORREGIDO)
  */
-export async function deleteHospitalAction(
-  _prevState: FormState | null,
-  formData: FormData
-): Promise<FormState> {
+export async function deleteHospitalAction(formData: FormData) {
   const id = Number(formData.get("hospitalId"));
 
   if (!id || isNaN(id)) {
-    return { success: false, message: "ID inválido" };
+    console.log("ID inválido");
+    return;
   }
 
   const result = await hospitalService.delete(id);
 
   if (!result.success) {
-    return { success: false, message: result.error || "Error al eliminar" };
+    console.log("ERROR DELETE:", result.error);
+    return;
   }
 
   revalidatePath("/dashboard/hospitales");
-  return { success: true, message: "Hospital eliminado exitosamente" };
 }
 
 /**
- * Obtiene un hospital por ID (Server Component)
+ * GET (sin cambios)
  */
 export async function getHospitalByIdAction(id: number) {
   return await hospitalService.getById(id);
 }
 
-/**
- * Obtiene todos los hospitales (Server Component)
- */
 export async function getAllHospitalesAction() {
   return await hospitalService.getAll();
 }
