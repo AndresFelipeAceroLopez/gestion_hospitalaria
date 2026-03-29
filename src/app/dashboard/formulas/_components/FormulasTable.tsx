@@ -27,7 +27,7 @@ export function FormulasTable({ formulas }: Props) {
               <td className="px-4 py-3 text-gray-600">{formula.tratamientoId}</td>
               <td className="px-4 py-3 text-gray-600">{formatDate(formula.fecha)}</td>
               <td className="px-4 py-3 text-right">
-                <form action={deleteFormulaAction.bind(null, null)}>
+                <form action={deleteFormulaAction.bind}>
                   <input type="hidden" name="formulaId" value={formula.formulaId} />
                   <button
                     type="submit"

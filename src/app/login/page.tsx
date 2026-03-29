@@ -2,15 +2,16 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { createBrowserSupabaseClient } from "@lib/supabase/client";
 
 const REMEMBER_KEY = "sgh_remember_email";
 
 export default function LoginPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const passwordUpdated = searchParams.get("updated") === "1";
+
+  const [passwordUpdated, setPasswordUpdated] = useState(false);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
@@ -24,7 +25,15 @@ export default function LoginPage() {
   const [resetError, setResetError] = useState("");
   const [resetSent, setResetSent] = useState(false);
 
-  // Pre-rellenar email si fue recordado previamente
+  // 🔥 FIX: manejar search params en cliente
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      setPasswordUpdated(params.get("updated") === "1");
+    }
+  }, []);
+
+  // Recordar email
   useEffect(() => {
     const saved = localStorage.getItem(REMEMBER_KEY);
     if (saved) {
@@ -39,6 +48,7 @@ export default function LoginPage() {
     setError("");
 
     const supabase = createBrowserSupabaseClient();
+
     const { error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -66,8 +76,12 @@ export default function LoginPage() {
     setResetError("");
 
     const supabase = createBrowserSupabaseClient();
+
+    const origin =
+      typeof window !== "undefined" ? window.location.origin : "";
+
     const { error: err } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-      redirectTo: `${window.location.origin}/auth/callback?type=recovery`,
+      redirectTo: `${origin}/auth/callback?type=recovery`,
     });
 
     if (err) {
@@ -75,12 +89,14 @@ export default function LoginPage() {
     } else {
       setResetSent(true);
     }
+
     setResetLoading(false);
   }
 
   return (
     <div className="min-h-screen bg-green-50 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
+
         {/* Marca */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-700 text-white text-2xl font-bold mb-4 shadow">
@@ -91,7 +107,8 @@ export default function LoginPage() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-          {/* ── Vista: Login ── */}
+
+          {/* LOGIN */}
           {view === "login" && (
             <>
               <h2 className="text-lg font-semibold text-gray-800 mb-6">
@@ -99,150 +116,79 @@ export default function LoginPage() {
               </h2>
 
               <form onSubmit={handleLogin} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Correo electrónico
-                  </label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    autoComplete="email"
-                    placeholder="usuario@correo.com"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  />
-                </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Contraseña
-                  </label>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    autoComplete="current-password"
-                    placeholder="••••••••"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  />
-                </div>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  placeholder="usuario@correo.com"
+                  className="w-full border rounded-lg px-3 py-2.5 text-sm"
+                />
 
-                {/* Recordar + Olvidé contraseña */}
-                <div className="flex items-center justify-between">
-                  <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  placeholder="••••••••"
+                  className="w-full border rounded-lg px-3 py-2.5 text-sm"
+                />
+
+                <div className="flex justify-between text-sm">
+                  <label>
                     <input
                       type="checkbox"
                       checked={remember}
                       onChange={(e) => setRemember(e.target.checked)}
-                      className="rounded border-gray-300 text-green-600 focus:ring-green-500"
-                    />
-                    Recordar correo
+                    />{" "}
+                    Recordar
                   </label>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setResetEmail(email);
-                      setResetSent(false);
-                      setResetError("");
-                      setView("reset");
-                    }}
-                    className="text-sm text-green-700 hover:underline"
-                  >
-                    ¿Olvidé mi contraseña?
+
+                  <button type="button" onClick={() => setView("reset")}>
+                    ¿Olvidé contraseña?
                   </button>
                 </div>
 
                 {passwordUpdated && (
-                  <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-sm text-green-700">
-                    Contraseña actualizada. Inicie sesión con su nueva contraseña.
+                  <div className="text-green-600 text-sm">
+                    Contraseña actualizada correctamente
                   </div>
                 )}
 
                 {error && (
-                  <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-700">
-                    {error}
-                  </div>
+                  <div className="text-red-600 text-sm">{error}</div>
                 )}
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full py-2.5 text-sm font-semibold text-white bg-green-700 rounded-lg hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
+                <button type="submit" disabled={loading}>
                   {loading ? "Ingresando..." : "Ingresar"}
                 </button>
               </form>
-
-              <p className="text-center text-sm text-gray-500 mt-6">
-                ¿No tienes cuenta?{" "}
-                <Link href="/registro" className="text-green-700 font-medium hover:underline">
-                  Regístrate
-                </Link>
-              </p>
             </>
           )}
 
-          {/* ── Vista: Recuperar contraseña ── */}
+          {/* RESET */}
           {view === "reset" && (
             <>
-              <button
-                onClick={() => setView("login")}
-                className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-5"
-              >
-                ← Volver
-              </button>
+              <button onClick={() => setView("login")}>← Volver</button>
 
-              <h2 className="text-lg font-semibold text-gray-800 mb-2">
-                Recuperar contraseña
-              </h2>
+              <form onSubmit={handleResetPassword}>
+                <input
+                  type="email"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  required
+                />
 
-              {resetSent ? (
-                <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-4 text-sm text-green-800">
-                  Se envió un enlace de recuperación a{" "}
-                  <strong>{resetEmail}</strong>. Revise su bandeja de entrada.
-                </div>
-              ) : (
-                <>
-                  <p className="text-sm text-gray-500 mb-4">
-                    Ingrese su correo registrado y le enviaremos un enlace para
-                    restablecer su contraseña.
-                  </p>
+                {resetError && <div>{resetError}</div>}
 
-                  <form onSubmit={handleResetPassword} className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Correo electrónico
-                      </label>
-                      <input
-                        type="email"
-                        value={resetEmail}
-                        onChange={(e) => setResetEmail(e.target.value)}
-                        required
-                        placeholder="usuario@correo.com"
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                      />
-                    </div>
-
-                    {resetError && (
-                      <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-700">
-                        {resetError}
-                      </div>
-                    )}
-
-                    <button
-                      type="submit"
-                      disabled={resetLoading}
-                      className="w-full py-2.5 text-sm font-semibold text-white bg-green-700 rounded-lg hover:bg-green-800 disabled:opacity-50 transition-colors"
-                    >
-                      {resetLoading ? "Enviando..." : "Enviar enlace de recuperación"}
-                    </button>
-                  </form>
-                </>
-              )}
+                <button type="submit">
+                  {resetLoading ? "Enviando..." : "Enviar enlace"}
+                </button>
+              </form>
             </>
           )}
+
         </div>
       </div>
     </div>
