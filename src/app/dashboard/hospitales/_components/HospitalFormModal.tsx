@@ -29,7 +29,9 @@ export function HospitalFormModal({ mode, hospital }: Props) {
             </h2>
 
             <form
-              action={async (formData) => {
+              onSubmit={async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
                 if (mode === "create") {
                   await createHospitalAction(formData);
                 } else {
