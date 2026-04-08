@@ -121,26 +121,15 @@ implements
     private mapToDomain(row: any): FormulaConRelaciones {
       const tr = row.tratamientos;
       const vi = tr?.visitas;
-
-      const tratamiento: TratamientoConRelaciones = {
-        tratamientoId: tr?.tratamientoid ?? 0,
-        visitaId: tr?.visitaid ?? 0,
-        fechaInicio: tr?.fechainicio || "",
-        fechaFin: tr?.fechafin || "",
-        visita: {
-            visitaId: vi?.visitaid ?? 0,
-            pacienteId: vi?.pacienteid ?? 0,
-            medicoId: vi?.medicoid ?? 0,
-            fecha: vi?.fecha || "",
-            hora: vi?.hora || "",
-        }
-      };
+      const pac = vi?.pacientes;
 
       return {
-        formulaId: row.formulaid ?? 0,
-        tratamientoId: row.tratamientoid ?? 0,
+        formulaId: row.formulaid ?? "",
+        tratamientoId: row.tratamientoid ?? "",
         fecha: row.fecha || "",
-        tratamiento
+        pacienteNombre: pac ? `${pac.nombre ?? ""} ${pac.apellido ?? ""}`.trim() : "—",
+        visitaFecha: vi?.fecha || "",
+        visitaHora: vi?.hora || "",
       };
     }
 }

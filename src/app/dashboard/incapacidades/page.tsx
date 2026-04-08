@@ -1,5 +1,6 @@
 import { IncapacidadRepository } from "@modules/incapacidades/incapacidad.repository";
 import { IncapacidadService } from "@modules/incapacidades/incapacidad.service";
+import { createServerSupabaseClient } from "@lib/supabase/server";
 import { IncapacidadesTable } from "./_components/IncapacidadesTable";
 import { IncapacidadFormModal } from "./_components/IncapacidadFormModal";
 
@@ -10,7 +11,15 @@ export const metadata = {
 const service = new IncapacidadService(new IncapacidadRepository());
 
 export default async function IncapacidadesPage() {
-  const result = await service.getAll();
+  const supabase = await createServerSupabaseClient();
+
+  const [result, { data: tratamientosRaw }] = await Promise.all([
+    service.getAll(),
+    supabase
+      .from("tratamientos")
+      .select("tratamientoid, fechainicio, visitas!visitaid(fecha, hora, pacientes!pacienteid(nombre, apellido))")
+      .order("fechainicio", { ascending: false }),
+  ]);
 
   if (!result.success) {
     return (
@@ -22,6 +31,13 @@ export default async function IncapacidadesPage() {
   }
 
   const incapacidades = result.data || [];
+  const tratamientos = (tratamientosRaw ?? []).map((t: any) => ({
+    tratamientoId: t.tratamientoid as string,
+    fechaInicio: t.fechainicio as string,
+    visitaFecha: t.visitas?.fecha as string,
+    visitaHora: t.visitas?.hora as string,
+    pacienteNombre: `${t.visitas?.pacientes?.nombre ?? ""} ${t.visitas?.pacientes?.apellido ?? ""}`.trim() || "—",
+  }));
 
   return (
     <div className="space-y-6">
@@ -32,7 +48,7 @@ export default async function IncapacidadesPage() {
             {incapacidades.length} incapacidad{incapacidades.length !== 1 ? "es" : ""} registrada{incapacidades.length !== 1 ? "s" : ""}
           </p>
         </div>
-        <IncapacidadFormModal mode="create" />
+        <IncapacidadFormModal mode="create" tratamientos={tratamientos} />
       </div>
 
       {incapacidades.length === 0 ? (

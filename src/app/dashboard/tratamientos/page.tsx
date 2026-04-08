@@ -1,5 +1,6 @@
 import { TratamientoRepository } from "@modules/tratamientos/tratamiento.repository";
 import { TratamientoService } from "@modules/tratamientos/tratamiento.service";
+import { createServerSupabaseClient } from "@lib/supabase/server";
 import { TratamientosTable } from "./_components/TratamientosTable";
 import { TratamientoFormModal } from "./_components/TratamientoFormModal";
 
@@ -10,7 +11,15 @@ export const metadata = {
 const service = new TratamientoService(new TratamientoRepository());
 
 export default async function TratamientosPage() {
-  const result = await service.getAll();
+  const supabase = await createServerSupabaseClient();
+
+  const [result, { data: visitasRaw }] = await Promise.all([
+    service.getAll(),
+    supabase
+      .from("visitas")
+      .select("visitaid, fecha, hora, pacientes!pacienteid(nombre, apellido)")
+      .order("fecha", { ascending: false }),
+  ]);
 
   if (!result.success) {
     return (
@@ -22,6 +31,12 @@ export default async function TratamientosPage() {
   }
 
   const tratamientos = result.data || [];
+  const visitas = (visitasRaw ?? []).map((v: any) => ({
+    visitaId: v.visitaid as string,
+    fecha: v.fecha as string,
+    hora: v.hora as string,
+    pacienteNombre: `${v.pacientes?.nombre ?? ""} ${v.pacientes?.apellido ?? ""}`.trim(),
+  }));
 
   return (
     <div className="space-y-6">
@@ -32,7 +47,7 @@ export default async function TratamientosPage() {
             {tratamientos.length} tratamiento{tratamientos.length !== 1 ? "s" : ""} registrado{tratamientos.length !== 1 ? "s" : ""}
           </p>
         </div>
-        <TratamientoFormModal mode="create" />
+        <TratamientoFormModal mode="create" visitas={visitas} />
       </div>
 
       {tratamientos.length === 0 ? (

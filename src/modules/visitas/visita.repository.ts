@@ -18,23 +18,29 @@ const VISITA_SELECT = `
   fecha,
   hora,
   pacientes!pacienteid(
-    pacienteid, 
-    nombre, 
-    apellido, 
-    fechanacimiento, 
-    sexo, 
-    direccion, 
-    telefono, 
+    pacienteid,
+    nombre,
+    apellido,
+    fechanacimiento,
+    sexo,
+    direccion,
+    telefono,
     correoelectronico
   ),
   medicos!medicoid(
-    medicoid, 
-    nombre, 
-    apellido, 
-    especialidadid, 
-    hospitalid, 
-    telefono, 
+    medicoid,
+    nombre,
+    apellido,
+    especialidadid,
+    hospitalid,
+    telefono,
     correoelectronico
+  ),
+  detallesvisitas(
+    detallevisitaid,
+    motivoid,
+    diagnostico,
+    motivosvisitas(descripcion)
   )
 `;
 
@@ -135,14 +141,20 @@ implements
     }
 
     private mapToDomain(row: any): VisitaConRelaciones {
+      const detalle = Array.isArray(row.detallesvisitas)
+        ? row.detallesvisitas[0]
+        : row.detallesvisitas ?? null;
+
       return {
         visitaId: row.visitaid ?? 0,
         pacienteId: row.pacienteid ?? "",
         medicoId: row.medicoid ?? "",
         fecha: row.fecha || "",
         hora: row.hora || "",
+        motivo: detalle?.motivosvisitas?.descripcion ?? undefined,
+        diagnostico: detalle?.diagnostico ?? undefined,
         paciente: {
-          pacienteId: row.pacientes?.pacienteid ?? 0,
+          pacienteId: row.pacientes?.pacienteid ?? "",
           nombre: row.pacientes?.nombre || "",
           apellido: row.pacientes?.apellido || "",
           fechaNacimiento: row.pacientes?.fechanacimiento || "",
@@ -152,11 +164,11 @@ implements
           correoElectronico: row.pacientes?.correoelectronico || "",
         },
         medico: {
-          medicoId: row.medicos?.medicoid ?? 0,
+          medicoId: row.medicos?.medicoid ?? "",
           nombre: row.medicos?.nombre || "",
           apellido: row.medicos?.apellido || "",
-          especialidadId: row.medicos?.especialidadid ?? 0,
-          hospitalId: row.medicos?.hospitalid ?? 0,
+          especialidadId: row.medicos?.especialidadid ?? "",
+          hospitalId: row.medicos?.hospitalid ?? "",
           telefono: row.medicos?.telefono || "",
           correoElectronico: row.medicos?.correoelectronico || "",
         }

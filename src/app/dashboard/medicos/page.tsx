@@ -1,5 +1,6 @@
 import { MedicoRepository } from "@modules/medicos/medico.repository";
 import { MedicoService } from "@modules/medicos/medico.service";
+import { createServerSupabaseClient } from "@lib/supabase/server";
 import { MedicosTable } from "./_components/MedicosTable";
 import { MedicoFormModal } from "./_components/MedicoFormModal";
 
@@ -10,7 +11,13 @@ export const metadata = {
 const service = new MedicoService(new MedicoRepository());
 
 export default async function MedicosPage() {
-  const result = await service.getAll();
+  const supabase = await createServerSupabaseClient();
+
+  const [result, { data: especialidadesRaw }, { data: hospitalesRaw }] = await Promise.all([
+    service.getAll(),
+    supabase.from("especialidades").select("especialidadid, nombre").order("nombre"),
+    supabase.from("hospitales").select("hospitalid, nombre").order("nombre"),
+  ]);
 
   if (!result.success) {
     return (
@@ -22,6 +29,8 @@ export default async function MedicosPage() {
   }
 
   const medicos = result.data || [];
+  const especialidades = (especialidadesRaw ?? []).map((e) => ({ id: e.especialidadid, nombre: e.nombre }));
+  const hospitales = (hospitalesRaw ?? []).map((h) => ({ id: h.hospitalid, nombre: h.nombre }));
 
   return (
     <div className="space-y-6">
@@ -32,7 +41,7 @@ export default async function MedicosPage() {
             {medicos.length} médico{medicos.length !== 1 ? "s" : ""} registrado{medicos.length !== 1 ? "s" : ""}
           </p>
         </div>
-        <MedicoFormModal mode="create" />
+        <MedicoFormModal mode="create" especialidades={especialidades} hospitales={hospitales} />
       </div>
 
       {medicos.length === 0 ? (

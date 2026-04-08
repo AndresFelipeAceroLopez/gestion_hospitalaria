@@ -28,12 +28,12 @@ export async function createMedicoAction(
   formData: FormData
 ): Promise<FormState> {
   const rawData = {
-    nombre: formData.get("nombre") as string,
-    apellido: formData.get("apellido") as string,
-    especialidadId: Number(formData.get("especialidadId")),
-    hospitalId: Number(formData.get("hospitalId")),
-    telefono: formData.get("telefono") as string,
-    correoElectronico: formData.get("correoElectronico") as string,
+    nombre:            formData.get("nombre"),
+    apellido:          formData.get("apellido"),
+    especialidadId:    formData.get("especialidadId"),
+    hospitalId:        formData.get("hospitalId"),
+    telefono:          formData.get("telefono"),
+    correoElectronico: formData.get("correoElectronico"),
   };
 
   const validation = createMedicoSchema.safeParse(rawData);
@@ -60,15 +60,14 @@ export async function updateMedicoAction(
   _prevState: FormState | null,
   formData: FormData
 ): Promise<FormState> {
-  const id = Number(formData.get("medicoId"));
   const rawData = {
-    medicoId: id,
-    nombre: formData.get("nombre") as string,
-    apellido: formData.get("apellido") as string,
-    especialidadId: Number(formData.get("especialidadId")),
-    hospitalId: Number(formData.get("hospitalId")),
-    telefono: formData.get("telefono") as string,
-    correoElectronico: formData.get("correoElectronico") as string,
+    medicoId:          formData.get("medicoId"),
+    nombre:            formData.get("nombre"),
+    apellido:          formData.get("apellido"),
+    especialidadId:    formData.get("especialidadId"),
+    hospitalId:        formData.get("hospitalId"),
+    telefono:          formData.get("telefono"),
+    correoElectronico: formData.get("correoElectronico"),
   };
 
   if (isNaN(id) || id <= 0) {
@@ -100,13 +99,13 @@ export async function deleteMedicoAction(
   _prevState: FormState | null,
   formData: FormData
 ): Promise<FormState> {
-  const id = Number(formData.get("medicoId"));
+  const id = String(formData.get("medicoId") ?? "");
 
-  if (!id || isNaN(id)) {
+  if (!id) {
     return { success: false, message: "ID inválido" };
   }
 
-  const result = await medicoService.delete(id);
+  const result = await medicoService.delete(id as unknown as number);
 
   if (!result.success) {
     return { success: false, message: result.error || "Error al eliminar" };

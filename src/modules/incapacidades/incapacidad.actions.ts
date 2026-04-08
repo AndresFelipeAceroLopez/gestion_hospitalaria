@@ -5,6 +5,7 @@
 
 "use server";
 
+import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { IncapacidadRepository } from "./incapacidad.repository";
@@ -28,8 +29,8 @@ export async function createIncapacidadAction(
   formData: FormData
 ): Promise<FormState> {
   const rawData = {
-    fecha: formData.get("fecha") as string,
-    tratamientoId: Number(formData.get("tratamientoId")),
+    fecha: formData.get("fecha"),
+    tratamientoId: formData.get("tratamientoId"),
   };
 
   const validation = createIncapacidadSchema.safeParse(rawData);
@@ -38,7 +39,7 @@ export async function createIncapacidadAction(
     return {
       success: false,
       message: "Errores de validación",
-      errors: validation.error.flatten().fieldErrors,
+      errors: z.flattenError(validation.error).fieldErrors,
     };
   }
 
@@ -56,14 +57,14 @@ export async function updateIncapacidadAction(
   _prevState: FormState | null,
   formData: FormData
 ): Promise<FormState> {
-  const id = Number(formData.get("incapacidadId"));
+  const id = String(formData.get("incapacidadId") ?? "");
   const rawData = {
     incapacidadId: id,
-    fecha: formData.get("fecha") as string,
-    tratamientoId: Number(formData.get("tratamientoId")),
+    fecha: formData.get("fecha"),
+    tratamientoId: formData.get("tratamientoId"),
   };
 
-  if (isNaN(id) || id <= 0) {
+  if (!id) {
     return { success: false, message: "ID inválido" };
   }
 
@@ -73,11 +74,11 @@ export async function updateIncapacidadAction(
     return {
       success: false,
       message: "Errores de validación",
-      errors: validation.error.flatten().fieldErrors,
+      errors: z.flattenError(validation.error).fieldErrors,
     };
   }
 
-  const result = await incapacidadService.update(id, validation.data);
+  const result = await incapacidadService.update(id as unknown as number, validation.data);
 
   if (!result.success) {
     return { success: false, message: result.error || "Error al actualizar" };
@@ -92,13 +93,13 @@ export async function deleteIncapacidadAction(
   _prevState: FormState | null,
   formData: FormData
 ): Promise<FormState> {
-  const id = Number(formData.get("incapacidadId"));
+  const id = String(formData.get("incapacidadId") ?? "");
 
-  if (!id || isNaN(id)) {
+  if (!id) {
     return { success: false, message: "ID inválido" };
   }
 
-  const result = await incapacidadService.delete(id);
+  const result = await incapacidadService.delete(id as unknown as number);
 
   if (!result.success) {
     return { success: false, message: result.error || "Error al eliminar" };
