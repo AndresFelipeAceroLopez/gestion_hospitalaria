@@ -1,12 +1,12 @@
 export interface OrdenExamen {
-  ordenExamenId: string; // UUID
-  visitaId: string;      // UUID
+  ordenExamenId: number;
+  visitaId: number;
   fecha: string;
 }
 
 export interface DetalleExamen {
   detalleExamenId: number;
-  ordenExamenId: string;
+  ordenExamenId: number;
   nombreExamen: string;
   tipoExamen: string;
   indicaciones: string;
@@ -24,5 +24,5 @@ export type UpdateOrdenExamenDTO = Partial<CreateOrdenExamenDTO>;
 
 export interface OrdenExamenFilters {
   fecha?: string;
-  visitaId?: string;
+  visitaId?: number; // 🔥 clave
 }

@@ -1,8 +1,3 @@
-/**
- * @file src/modules/examenes/examen.actions.ts
- * @description Server Actions para operaciones de órdenes de exámenes.
- */
-
 "use server";
 
 import { revalidatePath } from "next/cache";
@@ -27,10 +22,26 @@ export async function createOrdenExamenAction(
   _prevState: FormState | null,
   formData: FormData
 ): Promise<FormState> {
+
+  const visitaIdRaw = formData.get("visitaId");
+  const fechaRaw = formData.get("fecha");
+
+  if (!visitaIdRaw || typeof visitaIdRaw !== "string") {
+    return { success: false, message: "visitaId inválido" };
+  }
+
+  if (!fechaRaw || typeof fechaRaw !== "string") {
+    return { success: false, message: "fecha inválida" };
+  }
+
   const rawData = {
-    visitaId: formData.get("visitaId"),
-    fecha: formData.get("fecha"),
+    visitaId: Number(visitaIdRaw),
+    fecha: fechaRaw,
   };
+
+  if (isNaN(rawData.visitaId)) {
+    return { success: false, message: "visitaId inválido" };
+  }
 
   const validation = createOrdenExamenSchema.safeParse(rawData);
 
@@ -45,7 +56,10 @@ export async function createOrdenExamenAction(
   const result = await examenService.create(validation.data);
 
   if (!result.success) {
-    return { success: false, message: result.error || "Error al crear orden de examen" };
+    return {
+      success: false,
+      message: result.error || "Error al crear orden de examen"
+    };
   }
 
   revalidatePath("/dashboard/examenes");
@@ -56,15 +70,38 @@ export async function updateOrdenExamenAction(
   _prevState: FormState | null,
   formData: FormData
 ): Promise<FormState> {
-  const id = String(formData.get("ordenExamenId") ?? "");
+
+  const idRaw = formData.get("ordenExamenId");
+  const visitaIdRaw = formData.get("visitaId");
+  const fechaRaw = formData.get("fecha");
+
+  // Validar ID
+  if (!idRaw || typeof idRaw !== "string") {
+    return { success: false, message: "ID inválido" };
+  }
+
+  const id = Number(idRaw);
+
+  if (isNaN(id) || id <= 0) {
+    return { success: false, message: "ID inválido" };
+  }
+
+  // Validar otros campos
+  if (!visitaIdRaw || typeof visitaIdRaw !== "string") {
+    return { success: false, message: "visitaId inválido" };
+  }
+
+  if (!fechaRaw || typeof fechaRaw !== "string") {
+    return { success: false, message: "fecha inválida" };
+  }
+
   const rawData = {
-    ordenExamenId: id,
-    visitaId: formData.get("visitaId"),
-    fecha: formData.get("fecha"),
+    visitaId: Number(visitaIdRaw),
+    fecha: fechaRaw,
   };
 
-  if (!id) {
-    return { success: false, message: "ID inválido" };
+  if (isNaN(rawData.visitaId)) {
+    return { success: false, message: "visitaId inválido" };
   }
 
   const validation = updateOrdenExamenSchema.safeParse(rawData);
@@ -80,7 +117,10 @@ export async function updateOrdenExamenAction(
   const result = await examenService.update(id, validation.data);
 
   if (!result.success) {
-    return { success: false, message: result.error || "Error al actualizar" };
+    return {
+      success: false,
+      message: result.error || "Error al actualizar"
+    };
   }
 
   revalidatePath("/dashboard/examenes");
@@ -92,20 +132,34 @@ export async function deleteOrdenExamenAction(
   _prevState: FormState | null,
   formData: FormData
 ): Promise<FormState> {
-  const id = String(formData.get("ordenExamenId") ?? "");
 
-  if (!id) {
+  const idRaw = formData.get("ordenExamenId");
+
+  if (!idRaw || typeof idRaw !== "string") {
     return { success: false, message: "ID inválido" };
   }
 
-  const result = await examenService.delete(id as unknown as number);
+  const id = Number(idRaw);
+
+  if (isNaN(id) || id <= 0) {
+    return { success: false, message: "ID inválido" };
+  }
+
+  const result = await examenService.delete(id);
 
   if (!result.success) {
-    return { success: false, message: result.error || "Error al eliminar" };
+    return {
+      success: false,
+      message: result.error || "Error al eliminar"
+    };
   }
 
   revalidatePath("/dashboard/examenes");
-  return { success: true, message: "Orden de examen eliminada exitosamente" };
+
+  return {
+    success: true,
+    message: "Orden de examen eliminada exitosamente"
+  };
 }
 
 export async function getOrdenExamenByIdAction(id: number) {
