@@ -4,14 +4,14 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { VisitaRepository } from "../../modules/visitas/visita.repository";
+import { createServerSupabaseClient } from "../../lib/supabase/server";
 
 const CreateVisitaSchema = z.object({
   pacienteId: z.string().min(1, "Seleccione un paciente"),
   medicoId: z.string().min(1, "Seleccione un médico"),
   fecha: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Fecha inválida"),
-  // time inputs pueden enviar HH:MM o HH:MM:SS
   hora: z.string().regex(/^\d{2}:\d{2}/, "Hora inválida").transform((v) => v.slice(0, 5)),
-  motivoConsulta: z.string().optional(),
+  motivoId: z.string().optional(),
   diagnostico: z.string().optional(),
   frecuenciaCardiaca: z.string().optional().transform((v) => (v && v !== "" ? Number(v) : undefined)),
   presionArterial: z.string().optional(),
@@ -32,7 +32,7 @@ export async function createVisitaAction(
     return {
       success: false,
       message: "Errores en el formulario",
-      errors: validation.error.flatten().fieldErrors,
+      errors: z.flattenError(validation.error).fieldErrors,
     };
   }
 
@@ -40,7 +40,16 @@ export async function createVisitaAction(
 
   try {
     const repo = new VisitaRepository();
-    await repo.create({ pacienteId: d.pacienteId, medicoId: d.medicoId, fecha: d.fecha, hora: d.hora });
+    const visita = await repo.create({ pacienteId: d.pacienteId, medicoId: d.medicoId, fecha: d.fecha, hora: d.hora });
+
+    if (d.motivoId) {
+      const supabase = await createServerSupabaseClient();
+      await supabase.from("detallesvisitas").insert({
+        visitaid: visita.visitaId as unknown as number,
+        motivoid: d.motivoId as unknown as number,
+        diagnostico: d.diagnostico ?? "",
+      });
+    }
   } catch (err) {
     return {
       success: false,

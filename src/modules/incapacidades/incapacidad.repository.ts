@@ -10,7 +10,6 @@ import type {
   CreateIncapacidadDTO,
   IncapacidadFilters
 } from "./types";
-import type { TratamientoConRelaciones } from "../tratamientos/types";
 
 const INCAPACIDAD_SELECT = `
   incapacidadid,
@@ -120,26 +119,15 @@ implements
     private mapToDomain(row: any): IncapacidadConRelaciones {
       const tr = row.tratamientos;
       const vi = tr?.visitas;
-
-      const tratamiento: TratamientoConRelaciones = {
-        tratamientoId: tr?.tratamientoid ?? 0,
-        visitaId: tr?.visitaid ?? 0,
-        fechaInicio: tr?.fechainicio || "",
-        fechaFin: tr?.fechafin || "",
-        visita: {
-            visitaId: vi?.visitaid ?? 0,
-            pacienteId: vi?.pacienteid ?? 0,
-            medicoId: vi?.medicoid ?? 0,
-            fecha: vi?.fecha || "",
-            hora: vi?.hora || "",
-        }
-      };
+      const pac = vi?.pacientes;
 
       return {
-        incapacidadId: row.incapacidadid ?? 0,
-        fecha: row.fechainicio || row.fecha || "",
-        tratamientoId: row.tratamientoid ?? 0,
-        tratamiento
+        incapacidadId: row.incapacidadid ?? "",
+        fecha: row.fecha || "",
+        tratamientoId: row.tratamientoid ?? "",
+        pacienteNombre: pac ? `${pac.nombre ?? ""} ${pac.apellido ?? ""}`.trim() : "—",
+        visitaFecha: vi?.fecha || "",
+        visitaHora: vi?.hora || "",
       };
     }
 }

@@ -7,11 +7,11 @@ import type { Especialidad } from "../especialidades/types";
 import type { Hospital } from "../hospitales/types";
 
 export interface Medico {
-  medicoId: number; // <- medicoid en la BD (Integer)
+  medicoId: string;      // UUID
   nombre: string;
   apellido: string;
-  especialidadId: number; // <- especialidadid en la BD (Integer)
-  hospitalId: number; // <- hospitalid en la BD (Integer)
+  especialidadId: string; // UUID
+  hospitalId: string;     // UUID
   telefono: string;
   correoElectronico: string;
 }
@@ -28,6 +28,6 @@ export type UpdateMedicoDTO = Partial<CreateMedicoDTO>;
 export interface MedicoFilters {
   nombre?: string;
   apellido?: string;
-  especialidadId?: number;
-  hospitalId?: number;
+  especialidadId?: string;
+  hospitalId?: string;
 }

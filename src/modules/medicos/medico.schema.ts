@@ -6,11 +6,11 @@ import { z } from "zod";
  */
 
 export const medicoSchema = z.object({
-  medicoId: z.number().int().positive().optional(),
+  medicoId: z.string().optional(),
   nombre: z.string().min(1, "El nombre es obligatorio"),
   apellido: z.string().min(1, "El apellido es obligatorio"),
-  especialidadId: z.number().int().positive("La especialidad es obligatoria"),
-  hospitalId: z.number().int().positive("El hospital es obligatorio"),
+  especialidadId: z.string().min(1, "Seleccione una especialidad"),
+  hospitalId: z.string().min(1, "Seleccione un hospital"),
   telefono: z.string().min(1, "El telefono es obligatorio"),
   correoElectronico: z.string().email("Correo electronico invalido"),
 });

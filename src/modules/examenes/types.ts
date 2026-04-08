@@ -1,27 +1,21 @@
-/**
- * @file src/modules/examenes/types.ts
- * @description Tipos de dominio para el modulo de Examenes
- */
-
-import type { Visita } from "../visitas/types";
-
 export interface OrdenExamen {
-  ordenExamenId: number;
-  visitaId: number;
+  ordenExamenId: string; // UUID
+  visitaId: string;      // UUID
   fecha: string;
 }
 
 export interface DetalleExamen {
   detalleExamenId: number;
-  ordenExamenId: number;
+  ordenExamenId: string;
   nombreExamen: string;
   tipoExamen: string;
   indicaciones: string;
 }
 
-/** Orden de examen con datos relacionados */
 export interface OrdenExamenConRelaciones extends OrdenExamen {
-  visita: Visita;
+  pacienteNombre: string;
+  visitaFecha: string;
+  visitaHora: string;
   detalles?: DetalleExamen[];
 }
 
@@ -30,5 +24,5 @@ export type UpdateOrdenExamenDTO = Partial<CreateOrdenExamenDTO>;
 
 export interface OrdenExamenFilters {
   fecha?: string;
-  visitaId?: number;
+  visitaId?: string;
 }

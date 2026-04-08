@@ -1,26 +1,20 @@
-/**
- * @file src/modules/tratamientos/types.ts
- * @description Tipos de dominio para el modulo de Tratamientos
- */
-
-import type { Visita } from "../visitas/types";
-
 export interface Tratamiento {
-  tratamientoId: number;
-  visitaId: number;
+  tratamientoId: string; // UUID
+  visitaId: string;      // UUID
   fechaInicio: string;
   fechaFin: string;
 }
 
-/** Tratamiento con datos relacionados */
 export interface TratamientoConRelaciones extends Tratamiento {
-  visita: Visita;
+  pacienteNombre: string;
+  visitaFecha: string;
+  visitaHora: string;
 }
 
 export type CreateTratamientoDTO = Omit<Tratamiento, "tratamientoId">;
 export type UpdateTratamientoDTO = Partial<CreateTratamientoDTO>;
 
 export interface TratamientoFilters {
-  visitaId?: number;
+  visitaId?: string;
   fechaInicio?: string;
 }

@@ -43,6 +43,8 @@ export interface VisitaComplete extends Visita {
 export interface VisitaConRelaciones extends Visita {
   paciente: Paciente;
   medico: Medico;
+  motivo?: string; // descripcion de motivosvisitas
+  diagnostico?: string;
 }
 
 export type CreateVisitaDTO = Omit<Visita, "visitaId">;

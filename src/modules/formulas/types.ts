@@ -1,20 +1,14 @@
-/**
- * @file src/modules/formulas/types.ts
- * @description Tipos de dominio para el modulo de Formulas Medicas
- */
-
-import type { Tratamiento, TratamientoConRelaciones } from "../tratamientos/types";
 import type { Medicamento } from "../medicamentos/types";
 
 export interface Formula {
-  formulaId: number;
-  tratamientoId: number;
+  formulaId: string;      // UUID
+  tratamientoId: string;  // UUID
   fecha: string;
 }
 
 export interface DetalleFormula {
   detalleId: number;
-  formulaId: number;
+  formulaId: string;
   medicamentoId: number;
   posologia: string;
   presentacion: string;
@@ -22,14 +16,14 @@ export interface DetalleFormula {
   periodoUso: string;
 }
 
-/** Detalle de formula con medicamento relacionado */
 export interface DetalleFormulaConRelaciones extends DetalleFormula {
   medicamento: Medicamento;
 }
 
-/** Formula con datos relacionados profundos */
 export interface FormulaConRelaciones extends Formula {
-  tratamiento: TratamientoConRelaciones;
+  pacienteNombre: string;
+  visitaFecha: string;
+  visitaHora: string;
   detalles?: DetalleFormulaConRelaciones[];
 }
 
@@ -38,5 +32,5 @@ export type UpdateFormulaDTO = Partial<CreateFormulaDTO>;
 
 export interface FormulaFilters {
   fecha?: string;
-  tratamientoId?: number;
+  tratamientoId?: string;
 }
