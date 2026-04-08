@@ -37,8 +37,6 @@ export async function createOrdenExamenAction(
   const rawData = {
     visitaId: Number(visitaIdRaw),
     fecha: fechaRaw,
-    visitaId: formData.get("visitaId"),
-    fecha: formData.get("fecha"),
   };
 
   if (isNaN(rawData.visitaId)) {
@@ -83,14 +81,8 @@ export async function updateOrdenExamenAction(
   }
 
   const id = Number(idRaw);
-  const id = String(formData.get("ordenExamenId") ?? "");
-  const rawData = {
-    ordenExamenId: id,
-    visitaId: formData.get("visitaId"),
-    fecha: formData.get("fecha"),
-  };
 
-  if (!id) {
+  if (isNaN(id) || id <= 0) {
     return { success: false, message: "ID inválido" };
   }
 
@@ -150,13 +142,10 @@ export async function deleteOrdenExamenAction(
   const id = Number(idRaw);
 
   if (isNaN(id) || id <= 0) {
-  const id = String(formData.get("ordenExamenId") ?? "");
-
-  if (!id) {
     return { success: false, message: "ID inválido" };
   }
 
-  const result = await examenService.delete(id as unknown as number);
+  const result = await examenService.delete(id);
 
   if (!result.success) {
     return {
