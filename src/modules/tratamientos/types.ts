@@ -1,6 +1,6 @@
 export interface Tratamiento {
-  tratamientoId: string; // UUID
-  visitaId: string;      // UUID
+  tratamientoId: number;
+  visitaId: number;
   fechaInicio: string;
   fechaFin: string;
 }
@@ -15,6 +15,6 @@ export type CreateTratamientoDTO = Omit<Tratamiento, "tratamientoId">;
 export type UpdateTratamientoDTO = Partial<CreateTratamientoDTO>;
 
 export interface TratamientoFilters {
-  visitaId?: string;
+  visitaId?: number; // 🔥 clave
   fechaInicio?: string;
 }
