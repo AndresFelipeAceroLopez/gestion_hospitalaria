@@ -1,5 +1,6 @@
 import { FormulaRepository } from "@modules/formulas/formula.repository";
 import { FormulaService } from "@modules/formulas/formula.service";
+import { createServerSupabaseClient } from "@lib/supabase/server";
 import { FormulasTable } from "./_components/FormulasTable";
 import { FormulaFormModal } from "./_components/FormulaFormModal";
 
@@ -10,7 +11,15 @@ export const metadata = {
 const service = new FormulaService(new FormulaRepository());
 
 export default async function FormulasPage() {
-  const result = await service.getAll();
+  const supabase = await createServerSupabaseClient();
+
+  const [result, { data: tratamientosRaw }] = await Promise.all([
+    service.getAll(),
+    supabase
+      .from("tratamientos")
+      .select("tratamientoid, fechainicio, visitas!visitaid(fecha, hora, pacientes!pacienteid(nombre, apellido))")
+      .order("fechainicio", { ascending: false }),
+  ]);
 
   if (!result.success) {
     return (
@@ -22,6 +31,12 @@ export default async function FormulasPage() {
   }
 
   const formulas = result.data || [];
+  const tratamientos = (tratamientosRaw ?? []).map((t: any) => ({
+    tratamientoId: t.tratamientoid as string,
+    fechaInicio: t.fechainicio as string,
+    pacienteNombre: `${t.visitas?.pacientes?.nombre ?? ""} ${t.visitas?.pacientes?.apellido ?? ""}`.trim() || "—",
+    visitaFecha: t.visitas?.fecha as string ?? "",
+  }));
 
   return (
     <div className="space-y-6">
@@ -32,7 +47,7 @@ export default async function FormulasPage() {
             {formulas.length} fórmula{formulas.length !== 1 ? "s" : ""} registrada{formulas.length !== 1 ? "s" : ""}
           </p>
         </div>
-        <FormulaFormModal mode="create" />
+        <FormulaFormModal mode="create" tratamientos={tratamientos} />
       </div>
 
       {formulas.length === 0 ? (

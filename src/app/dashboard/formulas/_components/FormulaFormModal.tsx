@@ -6,12 +6,26 @@ import type { Formula } from "@modules/formulas/types";
 
 type FormState = { success: boolean; message: string; errors?: Record<string, string[]> };
 
+interface TratamientoOption {
+  tratamientoId: string;
+  fechaInicio: string;
+  pacienteNombre: string;
+  visitaFecha: string;
+}
+
 interface Props {
   mode: "create" | "edit";
   formula?: Formula;
+  tratamientos: TratamientoOption[];
 }
 
-export function FormulaFormModal({ mode, formula }: Props) {
+function formatFecha(fecha: string) {
+  if (!fecha) return "";
+  const [y, m, d] = fecha.split("-");
+  return `${d}/${m}/${y}`;
+}
+
+export function FormulaFormModal({ mode, formula, tratamientos }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [state, formAction, isPending] = useActionState<FormState | null, FormData>(
     createFormulaAction,
@@ -38,10 +52,20 @@ export function FormulaFormModal({ mode, formula }: Props) {
 
             <form action={formAction} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">ID Tratamiento *</label>
-                <input name="tratamientoId" type="number" required min={1} defaultValue={formula?.tratamientoId}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder="ID del tratamiento asociado" />
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tratamiento asociado *</label>
+                <select
+                  name="tratamientoId"
+                  required
+                  defaultValue={formula?.tratamientoId ?? ""}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+                >
+                  <option value="" disabled>Seleccione un tratamiento</option>
+                  {tratamientos.map((t) => (
+                    <option key={t.tratamientoId} value={t.tratamientoId}>
+                      {t.pacienteNombre} — {formatFecha(t.visitaFecha)}
+                    </option>
+                  ))}
+                </select>
                 {state?.errors?.tratamientoId && <p className="text-red-500 text-xs mt-1">{state.errors.tratamientoId[0]}</p>}
               </div>
 

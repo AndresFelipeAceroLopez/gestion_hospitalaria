@@ -103,8 +103,8 @@ implements IRepository<MedicoConRelaciones, number, CreateMedicoDTO>
       .insert({
         nombre: dto.nombre,
         apellido: dto.apellido,
-        especialidadid: dto.especialidadId,
-        hospitalid: dto.hospitalId,
+        especialidadid: dto.especialidadId as unknown as number,
+        hospitalid: dto.hospitalId as unknown as number,
         telefono: dto.telefono,
         correoelectronico: dto.correoElectronico,
       })
@@ -122,8 +122,8 @@ implements IRepository<MedicoConRelaciones, number, CreateMedicoDTO>
     const updateData: Record<string, unknown> = {};
     if (updates.nombre !== undefined) updateData.nombre = updates.nombre;
     if (updates.apellido !== undefined) updateData.apellido = updates.apellido;
-    if (updates.especialidadId !== undefined) updateData.especialidadid = updates.especialidadId;
-    if (updates.hospitalId !== undefined) updateData.hospitalid = updates.hospitalId;
+    if (updates.especialidadId !== undefined) updateData.especialidadid = updates.especialidadId as unknown as number;
+    if (updates.hospitalId !== undefined) updateData.hospitalid = updates.hospitalId as unknown as number;
     if (updates.telefono !== undefined) updateData.telefono = updates.telefono;
     if (updates.correoElectronico !== undefined) updateData.correoelectronico = updates.correoElectronico;
 
@@ -153,11 +153,11 @@ implements IRepository<MedicoConRelaciones, number, CreateMedicoDTO>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private mapRow(row: Record<string, any>): MedicoConRelaciones {
     return {
-      medicoId: row.medicoid,
+      medicoId: row.medicoid ?? "",
       nombre: row.nombre,
       apellido: row.apellido,
-      especialidadId: row.especialidadid,
-      hospitalId: row.hospitalid,
+      especialidadId: row.especialidadid ?? "",
+      hospitalId: row.hospitalid ?? "",
       telefono: row.telefono,
       correoElectronico: row.correoelectronico,
       especialidad: {

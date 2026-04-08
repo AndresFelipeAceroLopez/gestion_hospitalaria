@@ -125,17 +125,14 @@ implements
 
     private mapToDomain(row: any): OrdenExamenConRelaciones {
       const vi = row.visitas;
+      const pac = vi?.pacientes;
       return {
-        ordenExamenId: row.ordenexamenid ?? 0,
-        visitaId: row.visitaid ?? 0,
+        ordenExamenId: row.ordenexamenid ?? "",
+        visitaId: row.visitaid ?? "",
         fecha: row.fecha || "",
-        visita: vi ? {
-          visitaId: vi.visitaid ?? 0,
-          pacienteId: vi.pacienteid ?? 0,
-          medicoId: vi.medicoid ?? 0,
-          fecha: vi.fecha || "",
-          hora: vi.hora || "",
-        } : undefined as any
+        pacienteNombre: pac ? `${pac.nombre ?? ""} ${pac.apellido ?? ""}`.trim() : "—",
+        visitaFecha: vi?.fecha || "",
+        visitaHora: vi?.hora || "",
       };
     }
 }
