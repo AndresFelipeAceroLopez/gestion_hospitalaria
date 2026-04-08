@@ -1,8 +1,3 @@
-/**
- * @file src/modules/medicos/medico.actions.ts
- * @description Server Actions para operaciones de medicos.
- */
-
 "use server";
 
 import { revalidatePath } from "next/cache";
@@ -27,14 +22,37 @@ export async function createMedicoAction(
   _prevState: FormState | null,
   formData: FormData
 ): Promise<FormState> {
+
+  const nombre = formData.get("nombre");
+  const apellido = formData.get("apellido");
+  const especialidadIdRaw = formData.get("especialidadId");
+  const hospitalIdRaw = formData.get("hospitalId");
+  const telefono = formData.get("telefono");
+  const correoElectronico = formData.get("correoElectronico");
+
+  if (
+    typeof nombre !== "string" ||
+    typeof apellido !== "string" ||
+    typeof telefono !== "string" ||
+    typeof correoElectronico !== "string" ||
+    typeof especialidadIdRaw !== "string" ||
+    typeof hospitalIdRaw !== "string"
+  ) {
+    return { success: false, message: "Datos inválidos" };
+  }
+
   const rawData = {
-    nombre:            formData.get("nombre"),
-    apellido:          formData.get("apellido"),
-    especialidadId:    formData.get("especialidadId"),
-    hospitalId:        formData.get("hospitalId"),
-    telefono:          formData.get("telefono"),
-    correoElectronico: formData.get("correoElectronico"),
+    nombre,
+    apellido,
+    especialidadId: Number(especialidadIdRaw),
+    hospitalId: Number(hospitalIdRaw),
+    telefono,
+    correoElectronico,
   };
+
+  if (isNaN(rawData.especialidadId) || isNaN(rawData.hospitalId)) {
+    return { success: false, message: "IDs inválidos" };
+  }
 
   const validation = createMedicoSchema.safeParse(rawData);
 
@@ -49,7 +67,10 @@ export async function createMedicoAction(
   const result = await medicoService.create(validation.data);
 
   if (!result.success) {
-    return { success: false, message: result.error || "Error al crear médico" };
+    return {
+      success: false,
+      message: result.error || "Error al crear médico"
+    };
   }
 
   revalidatePath("/dashboard/medicos");
@@ -60,18 +81,48 @@ export async function updateMedicoAction(
   _prevState: FormState | null,
   formData: FormData
 ): Promise<FormState> {
-  const rawData = {
-    medicoId:          formData.get("medicoId"),
-    nombre:            formData.get("nombre"),
-    apellido:          formData.get("apellido"),
-    especialidadId:    formData.get("especialidadId"),
-    hospitalId:        formData.get("hospitalId"),
-    telefono:          formData.get("telefono"),
-    correoElectronico: formData.get("correoElectronico"),
-  };
+
+  const idRaw = formData.get("medicoId");
+
+  if (!idRaw || typeof idRaw !== "string") {
+    return { success: false, message: "ID inválido" };
+  }
+
+  const id = Number(idRaw);
 
   if (isNaN(id) || id <= 0) {
     return { success: false, message: "ID inválido" };
+  }
+
+  const nombre = formData.get("nombre");
+  const apellido = formData.get("apellido");
+  const especialidadIdRaw = formData.get("especialidadId");
+  const hospitalIdRaw = formData.get("hospitalId");
+  const telefono = formData.get("telefono");
+  const correoElectronico = formData.get("correoElectronico");
+
+  if (
+    typeof nombre !== "string" ||
+    typeof apellido !== "string" ||
+    typeof telefono !== "string" ||
+    typeof correoElectronico !== "string" ||
+    typeof especialidadIdRaw !== "string" ||
+    typeof hospitalIdRaw !== "string"
+  ) {
+    return { success: false, message: "Datos inválidos" };
+  }
+
+  const rawData = {
+    nombre,
+    apellido,
+    especialidadId: Number(especialidadIdRaw),
+    hospitalId: Number(hospitalIdRaw),
+    telefono,
+    correoElectronico,
+  };
+
+  if (isNaN(rawData.especialidadId) || isNaN(rawData.hospitalId)) {
+    return { success: false, message: "IDs inválidos" };
   }
 
   const validation = updateMedicoSchema.safeParse(rawData);
@@ -87,7 +138,10 @@ export async function updateMedicoAction(
   const result = await medicoService.update(id, validation.data);
 
   if (!result.success) {
-    return { success: false, message: result.error || "Error al actualizar" };
+    return {
+      success: false,
+      message: result.error || "Error al actualizar"
+    };
   }
 
   revalidatePath("/dashboard/medicos");
@@ -99,20 +153,34 @@ export async function deleteMedicoAction(
   _prevState: FormState | null,
   formData: FormData
 ): Promise<FormState> {
-  const id = String(formData.get("medicoId") ?? "");
 
-  if (!id) {
+  const idRaw = formData.get("medicoId");
+
+  if (!idRaw || typeof idRaw !== "string") {
     return { success: false, message: "ID inválido" };
   }
 
-  const result = await medicoService.delete(id as unknown as number);
+  const id = Number(idRaw);
+
+  if (isNaN(id) || id <= 0) {
+    return { success: false, message: "ID inválido" };
+  }
+
+  const result = await medicoService.delete(id);
 
   if (!result.success) {
-    return { success: false, message: result.error || "Error al eliminar" };
+    return {
+      success: false,
+      message: result.error || "Error al eliminar"
+    };
   }
 
   revalidatePath("/dashboard/medicos");
-  return { success: true, message: "Médico eliminado exitosamente" };
+
+  return {
+    success: true,
+    message: "Médico eliminado exitosamente"
+  };
 }
 
 export async function getMedicoByIdAction(id: number) {

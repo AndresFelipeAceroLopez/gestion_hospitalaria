@@ -1,14 +1,14 @@
 import type { Medicamento } from "../medicamentos/types";
 
 export interface Formula {
-  formulaId: string;      // UUID
-  tratamientoId: string;  // UUID
+  formulaId: number;
+  tratamientoId: number;
   fecha: string;
 }
 
 export interface DetalleFormula {
   detalleId: number;
-  formulaId: string;
+  formulaId: number;
   medicamentoId: number;
   posologia: string;
   presentacion: string;
@@ -32,5 +32,5 @@ export type UpdateFormulaDTO = Partial<CreateFormulaDTO>;
 
 export interface FormulaFilters {
   fecha?: string;
-  tratamientoId?: string;
+  tratamientoId?: number; // 🔥 clave
 }

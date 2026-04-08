@@ -1,8 +1,3 @@
-/**
- * @file src/modules/tratamientos/tratamiento.actions.ts
- * @description Server Actions para operaciones de tratamientos.
- */
-
 "use server";
 
 import { revalidatePath } from "next/cache";
@@ -27,11 +22,28 @@ export async function createTratamientoAction(
   _prevState: FormState | null,
   formData: FormData
 ): Promise<FormState> {
+
+  const visitaIdRaw = formData.get("visitaId");
+  const fechaInicio = formData.get("fechaInicio");
+  const fechaFin = formData.get("fechaFin");
+
+  if (
+    typeof visitaIdRaw !== "string" ||
+    typeof fechaInicio !== "string" ||
+    typeof fechaFin !== "string"
+  ) {
+    return { success: false, message: "Datos inválidos" };
+  }
+
   const rawData = {
-    visitaId: formData.get("visitaId"),
-    fechaInicio: formData.get("fechaInicio"),
-    fechaFin: formData.get("fechaFin"),
+    visitaId: Number(visitaIdRaw),
+    fechaInicio,
+    fechaFin,
   };
+
+  if (isNaN(rawData.visitaId)) {
+    return { success: false, message: "visitaId inválido" };
+  }
 
   const validation = createTratamientoSchema.safeParse(rawData);
 
@@ -46,7 +58,10 @@ export async function createTratamientoAction(
   const result = await tratamientoService.create(validation.data);
 
   if (!result.success) {
-    return { success: false, message: result.error || "Error al crear tratamiento" };
+    return {
+      success: false,
+      message: result.error || "Error al crear tratamiento"
+    };
   }
 
   revalidatePath("/dashboard/tratamientos");
@@ -57,16 +72,40 @@ export async function updateTratamientoAction(
   _prevState: FormState | null,
   formData: FormData
 ): Promise<FormState> {
-  const id = String(formData.get("tratamientoId") ?? "");
+
+  const idRaw = formData.get("tratamientoId");
+  const visitaIdRaw = formData.get("visitaId");
+  const fechaInicio = formData.get("fechaInicio");
+  const fechaFin = formData.get("fechaFin");
+
+  // ✅ Validar ID
+  if (!idRaw || typeof idRaw !== "string") {
+    return { success: false, message: "ID inválido" };
+  }
+
+  const id = Number(idRaw);
+
+  if (isNaN(id) || id <= 0) {
+    return { success: false, message: "ID inválido" };
+  }
+
+  // ✅ Validar campos
+  if (
+    typeof visitaIdRaw !== "string" ||
+    typeof fechaInicio !== "string" ||
+    typeof fechaFin !== "string"
+  ) {
+    return { success: false, message: "Datos inválidos" };
+  }
+
   const rawData = {
-    tratamientoId: id,
-    visitaId: formData.get("visitaId"),
-    fechaInicio: formData.get("fechaInicio"),
-    fechaFin: formData.get("fechaFin"),
+    visitaId: Number(visitaIdRaw),
+    fechaInicio,
+    fechaFin,
   };
 
-  if (!id) {
-    return { success: false, message: "ID inválido" };
+  if (isNaN(rawData.visitaId)) {
+    return { success: false, message: "visitaId inválido" };
   }
 
   const validation = updateTratamientoSchema.safeParse(rawData);
@@ -82,7 +121,10 @@ export async function updateTratamientoAction(
   const result = await tratamientoService.update(id, validation.data);
 
   if (!result.success) {
-    return { success: false, message: result.error || "Error al actualizar" };
+    return {
+      success: false,
+      message: result.error || "Error al actualizar"
+    };
   }
 
   revalidatePath("/dashboard/tratamientos");
@@ -94,20 +136,34 @@ export async function deleteTratamientoAction(
   _prevState: FormState | null,
   formData: FormData
 ): Promise<FormState> {
-  const id = Number(formData.get("tratamientoId"));
 
-  if (!id || isNaN(id)) {
+  const idRaw = formData.get("tratamientoId");
+
+  if (!idRaw || typeof idRaw !== "string") {
+    return { success: false, message: "ID inválido" };
+  }
+
+  const id = Number(idRaw);
+
+  if (isNaN(id) || id <= 0) {
     return { success: false, message: "ID inválido" };
   }
 
   const result = await tratamientoService.delete(id);
 
   if (!result.success) {
-    return { success: false, message: result.error || "Error al eliminar" };
+    return {
+      success: false,
+      message: result.error || "Error al eliminar"
+    };
   }
 
   revalidatePath("/dashboard/tratamientos");
-  return { success: true, message: "Tratamiento eliminado exitosamente" };
+
+  return {
+    success: true,
+    message: "Tratamiento eliminado exitosamente"
+  };
 }
 
 export async function getTratamientoByIdAction(id: number) {

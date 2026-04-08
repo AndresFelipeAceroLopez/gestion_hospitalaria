@@ -1,8 +1,3 @@
-/**
- * @file src/modules/formulas/formula.actions.ts
- * @description Server Actions para operaciones de fórmulas médicas.
- */
-
 "use server";
 
 import { revalidatePath } from "next/cache";
@@ -27,10 +22,26 @@ export async function createFormulaAction(
   _prevState: FormState | null,
   formData: FormData
 ): Promise<FormState> {
+
+  const tratamientoIdRaw = formData.get("tratamientoId");
+  const fechaRaw = formData.get("fecha");
+
+  if (!tratamientoIdRaw || typeof tratamientoIdRaw !== "string") {
+    return { success: false, message: "tratamientoId inválido" };
+  }
+
+  if (!fechaRaw || typeof fechaRaw !== "string") {
+    return { success: false, message: "fecha inválida" };
+  }
+
   const rawData = {
-    tratamientoId: formData.get("tratamientoId"),
-    fecha: formData.get("fecha"),
+    tratamientoId: Number(tratamientoIdRaw),
+    fecha: fechaRaw,
   };
+
+  if (isNaN(rawData.tratamientoId)) {
+    return { success: false, message: "tratamientoId inválido" };
+  }
 
   const validation = createFormulaSchema.safeParse(rawData);
 
@@ -45,7 +56,10 @@ export async function createFormulaAction(
   const result = await formulaService.create(validation.data);
 
   if (!result.success) {
-    return { success: false, message: result.error || "Error al crear fórmula" };
+    return {
+      success: false,
+      message: result.error || "Error al crear fórmula"
+    };
   }
 
   revalidatePath("/dashboard/formulas");
@@ -56,15 +70,38 @@ export async function updateFormulaAction(
   _prevState: FormState | null,
   formData: FormData
 ): Promise<FormState> {
-  const id = String(formData.get("formulaId") ?? "");
+
+  const idRaw = formData.get("formulaId");
+  const tratamientoIdRaw = formData.get("tratamientoId");
+  const fechaRaw = formData.get("fecha");
+
+  // ✅ Validar ID
+  if (!idRaw || typeof idRaw !== "string") {
+    return { success: false, message: "ID inválido" };
+  }
+
+  const id = Number(idRaw);
+
+  if (isNaN(id) || id <= 0) {
+    return { success: false, message: "ID inválido" };
+  }
+
+  // ✅ Validar campos
+  if (!tratamientoIdRaw || typeof tratamientoIdRaw !== "string") {
+    return { success: false, message: "tratamientoId inválido" };
+  }
+
+  if (!fechaRaw || typeof fechaRaw !== "string") {
+    return { success: false, message: "fecha inválida" };
+  }
+
   const rawData = {
-    formulaId: id,
-    tratamientoId: formData.get("tratamientoId"),
-    fecha: formData.get("fecha"),
+    tratamientoId: Number(tratamientoIdRaw),
+    fecha: fechaRaw,
   };
 
-  if (!id) {
-    return { success: false, message: "ID inválido" };
+  if (isNaN(rawData.tratamientoId)) {
+    return { success: false, message: "tratamientoId inválido" };
   }
 
   const validation = updateFormulaSchema.safeParse(rawData);
@@ -80,7 +117,10 @@ export async function updateFormulaAction(
   const result = await formulaService.update(id, validation.data);
 
   if (!result.success) {
-    return { success: false, message: result.error || "Error al actualizar" };
+    return {
+      success: false,
+      message: result.error || "Error al actualizar"
+    };
   }
 
   revalidatePath("/dashboard/formulas");
@@ -92,20 +132,34 @@ export async function deleteFormulaAction(
   _prevState: FormState | null,
   formData: FormData
 ): Promise<FormState> {
-  const id = String(formData.get("formulaId") ?? "");
 
-  if (!id) {
+  const idRaw = formData.get("formulaId");
+
+  if (!idRaw || typeof idRaw !== "string") {
     return { success: false, message: "ID inválido" };
   }
 
-  const result = await formulaService.delete(id as unknown as number);
+  const id = Number(idRaw);
+
+  if (isNaN(id) || id <= 0) {
+    return { success: false, message: "ID inválido" };
+  }
+
+  const result = await formulaService.delete(id);
 
   if (!result.success) {
-    return { success: false, message: result.error || "Error al eliminar" };
+    return {
+      success: false,
+      message: result.error || "Error al eliminar"
+    };
   }
 
   revalidatePath("/dashboard/formulas");
-  return { success: true, message: "Fórmula eliminada exitosamente" };
+
+  return {
+    success: true,
+    message: "Fórmula eliminada exitosamente"
+  };
 }
 
 export async function getFormulaByIdAction(id: number) {

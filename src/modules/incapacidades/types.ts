@@ -4,9 +4,9 @@
  */
 
 export interface Incapacidad {
-  incapacidadId: string;
+  incapacidadId: number;
   fecha: string;
-  tratamientoId: string;
+  tratamientoId: number;
 }
 
 /** Incapacidad con datos relacionados profundos */
@@ -21,5 +21,5 @@ export type UpdateIncapacidadDTO = Partial<CreateIncapacidadDTO>;
 
 export interface IncapacidadFilters {
   fecha?: string;
-  tratamientoId?: string;
+  tratamientoId?: number; // 🔥 clave
 }
