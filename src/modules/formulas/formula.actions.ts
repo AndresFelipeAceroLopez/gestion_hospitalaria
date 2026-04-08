@@ -28,8 +28,8 @@ export async function createFormulaAction(
   formData: FormData
 ): Promise<FormState> {
   const rawData = {
-    tratamientoId: Number(formData.get("tratamientoId")),
-    fecha: formData.get("fecha") as string,
+    tratamientoId: formData.get("tratamientoId"),
+    fecha: formData.get("fecha"),
   };
 
   const validation = createFormulaSchema.safeParse(rawData);
@@ -56,14 +56,14 @@ export async function updateFormulaAction(
   _prevState: FormState | null,
   formData: FormData
 ): Promise<FormState> {
-  const id = Number(formData.get("formulaId"));
+  const id = String(formData.get("formulaId") ?? "");
   const rawData = {
     formulaId: id,
-    tratamientoId: Number(formData.get("tratamientoId")),
-    fecha: formData.get("fecha") as string,
+    tratamientoId: formData.get("tratamientoId"),
+    fecha: formData.get("fecha"),
   };
 
-  if (isNaN(id) || id <= 0) {
+  if (!id) {
     return { success: false, message: "ID inválido" };
   }
 
@@ -92,13 +92,13 @@ export async function deleteFormulaAction(
   _prevState: FormState | null,
   formData: FormData
 ): Promise<FormState> {
-  const id = Number(formData.get("formulaId"));
+  const id = String(formData.get("formulaId") ?? "");
 
-  if (!id || isNaN(id)) {
+  if (!id) {
     return { success: false, message: "ID inválido" };
   }
 
-  const result = await formulaService.delete(id);
+  const result = await formulaService.delete(id as unknown as number);
 
   if (!result.success) {
     return { success: false, message: result.error || "Error al eliminar" };

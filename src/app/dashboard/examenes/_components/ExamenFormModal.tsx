@@ -6,12 +6,26 @@ import type { OrdenExamen } from "@modules/examenes/types";
 
 type FormState = { success: boolean; message: string; errors?: Record<string, string[]> };
 
+interface VisitaOption {
+  visitaId: string;
+  fecha: string;
+  hora: string;
+  pacienteNombre: string;
+}
+
 interface Props {
   mode: "create" | "edit";
   examen?: OrdenExamen;
+  visitas: VisitaOption[];
 }
 
-export function ExamenFormModal({ mode, examen }: Props) {
+function formatFecha(fecha: string) {
+  if (!fecha) return "";
+  const [y, m, d] = fecha.split("-");
+  return `${d}/${m}/${y}`;
+}
+
+export function ExamenFormModal({ mode, examen, visitas }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [state, formAction, isPending] = useActionState<FormState | null, FormData>(
     createOrdenExamenAction,
@@ -38,10 +52,20 @@ export function ExamenFormModal({ mode, examen }: Props) {
 
             <form action={formAction} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">ID Visita *</label>
-                <input name="visitaId" type="number" required min={1} defaultValue={examen?.visitaId}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder="ID de la visita asociada" />
+                <label className="block text-sm font-medium text-gray-700 mb-1">Visita asociada *</label>
+                <select
+                  name="visitaId"
+                  required
+                  defaultValue={examen?.visitaId ?? ""}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+                >
+                  <option value="" disabled>Seleccione una visita</option>
+                  {visitas.map((v) => (
+                    <option key={v.visitaId} value={v.visitaId}>
+                      {v.pacienteNombre} — {formatFecha(v.fecha)} {v.hora}
+                    </option>
+                  ))}
+                </select>
                 {state?.errors?.visitaId && <p className="text-red-500 text-xs mt-1">{state.errors.visitaId[0]}</p>}
               </div>
 

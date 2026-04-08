@@ -28,8 +28,8 @@ export async function createOrdenExamenAction(
   formData: FormData
 ): Promise<FormState> {
   const rawData = {
-    visitaId: Number(formData.get("visitaId")),
-    fecha: formData.get("fecha") as string,
+    visitaId: formData.get("visitaId"),
+    fecha: formData.get("fecha"),
   };
 
   const validation = createOrdenExamenSchema.safeParse(rawData);
@@ -56,14 +56,14 @@ export async function updateOrdenExamenAction(
   _prevState: FormState | null,
   formData: FormData
 ): Promise<FormState> {
-  const id = Number(formData.get("ordenExamenId"));
+  const id = String(formData.get("ordenExamenId") ?? "");
   const rawData = {
     ordenExamenId: id,
-    visitaId: Number(formData.get("visitaId")),
-    fecha: formData.get("fecha") as string,
+    visitaId: formData.get("visitaId"),
+    fecha: formData.get("fecha"),
   };
 
-  if (isNaN(id) || id <= 0) {
+  if (!id) {
     return { success: false, message: "ID inválido" };
   }
 
@@ -92,13 +92,13 @@ export async function deleteOrdenExamenAction(
   _prevState: FormState | null,
   formData: FormData
 ): Promise<FormState> {
-  const id = Number(formData.get("ordenExamenId"));
+  const id = String(formData.get("ordenExamenId") ?? "");
 
-  if (!id || isNaN(id)) {
+  if (!id) {
     return { success: false, message: "ID inválido" };
   }
 
-  const result = await examenService.delete(id);
+  const result = await examenService.delete(id as unknown as number);
 
   if (!result.success) {
     return { success: false, message: result.error || "Error al eliminar" };

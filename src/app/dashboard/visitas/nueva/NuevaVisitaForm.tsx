@@ -6,13 +6,15 @@ import { createVisitaAction } from "@modules/visitas/visita.actions";
 
 interface PacienteOption { pacienteId: number; nombre: string; apellido: string; }
 interface MedicoOption  { medicoId: number;  nombre: string; apellido: string; }
+interface MotivoOption  { motivoId: any;     descripcion: string; }
 
 interface Props {
   pacientes: PacienteOption[];
   medicos: MedicoOption[];
+  motivos: MotivoOption[];
 }
 
-export default function NuevaVisitaForm({ pacientes, medicos }: Props) {
+export default function NuevaVisitaForm({ pacientes, medicos, motivos }: Props) {
   const router = useRouter();
   const [state, formAction, isPending] = useActionState(createVisitaAction, null);
 
@@ -108,18 +110,20 @@ export default function NuevaVisitaForm({ pacientes, medicos }: Props) {
         <div className="grid grid-cols-1 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Motivo de consulta *
+              Motivo de consulta
             </label>
-            <textarea
-              name="motivoConsulta"
-              rows={3}
-              required
-              placeholder="Describa el motivo de la consulta..."
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
-            {state?.errors?.motivoConsulta && (
-              <p className="text-red-500 text-xs mt-1">{state.errors.motivoConsulta[0]}</p>
-            )}
+            <select
+              name="motivoId"
+              defaultValue=""
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+            >
+              <option value="">Sin motivo registrado</option>
+              {motivos.map((mv) => (
+                <option key={mv.motivoId} value={mv.motivoId}>
+                  {mv.descripcion}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">

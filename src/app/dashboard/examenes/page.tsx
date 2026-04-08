@@ -1,5 +1,6 @@
 import { OrdenExamenRepository } from "@modules/examenes/examen.repository";
 import { OrdenExamenService } from "@modules/examenes/examen.service";
+import { createServerSupabaseClient } from "@lib/supabase/server";
 import { ExamenesTable } from "./_components/ExamenesTable";
 import { ExamenFormModal } from "./_components/ExamenFormModal";
 
@@ -10,7 +11,15 @@ export const metadata = {
 const service = new OrdenExamenService(new OrdenExamenRepository());
 
 export default async function ExamenesPage() {
-  const result = await service.getAll();
+  const supabase = await createServerSupabaseClient();
+
+  const [result, { data: visitasRaw }] = await Promise.all([
+    service.getAll(),
+    supabase
+      .from("visitas")
+      .select("visitaid, fecha, hora, pacientes!pacienteid(nombre, apellido)")
+      .order("fecha", { ascending: false }),
+  ]);
 
   if (!result.success) {
     return (
@@ -22,6 +31,12 @@ export default async function ExamenesPage() {
   }
 
   const examenes = result.data || [];
+  const visitas = (visitasRaw ?? []).map((v: any) => ({
+    visitaId: v.visitaid as string,
+    fecha: v.fecha as string,
+    hora: v.hora as string,
+    pacienteNombre: `${v.pacientes?.nombre ?? ""} ${v.pacientes?.apellido ?? ""}`.trim() || "—",
+  }));
 
   return (
     <div className="space-y-6">
@@ -32,7 +47,7 @@ export default async function ExamenesPage() {
             {examenes.length} orden{examenes.length !== 1 ? "es" : ""} registrada{examenes.length !== 1 ? "s" : ""}
           </p>
         </div>
-        <ExamenFormModal mode="create" />
+        <ExamenFormModal mode="create" visitas={visitas} />
       </div>
 
       {examenes.length === 0 ? (

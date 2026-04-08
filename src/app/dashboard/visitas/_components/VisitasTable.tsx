@@ -13,9 +13,9 @@ export function VisitasTable({ visitas }: Props) {
       <table className="w-full text-sm">
         <thead className="bg-gray-50 border-b border-gray-200">
           <tr>
-            <th className="text-left px-4 py-3 font-medium text-gray-600">ID</th>
             <th className="text-left px-4 py-3 font-medium text-gray-600">Paciente</th>
             <th className="text-left px-4 py-3 font-medium text-gray-600">Médico</th>
+            <th className="text-left px-4 py-3 font-medium text-gray-600">Motivo</th>
             <th className="text-left px-4 py-3 font-medium text-gray-600">Fecha</th>
             <th className="text-left px-4 py-3 font-medium text-gray-600">Hora</th>
           </tr>
@@ -23,12 +23,20 @@ export function VisitasTable({ visitas }: Props) {
         <tbody className="divide-y divide-gray-100">
           {visitas.map((visita, index) => (
             <tr key={`v-${visita.visitaId ?? index}`} className="hover:bg-gray-50 transition-colors">
-              <td className="px-4 py-3 text-gray-400 text-xs">{visita.visitaId}</td>
               <td className="px-4 py-3 font-medium text-gray-900">
                 {getFullName(visita.paciente.nombre, visita.paciente.apellido)}
               </td>
               <td className="px-4 py-3 text-gray-600">
                 Dr. {getFullName(visita.medico.nombre, visita.medico.apellido)}
+              </td>
+              <td className="px-4 py-3 text-gray-600">
+                {visita.motivo ? (
+                  <span className="inline-block bg-green-50 text-green-700 text-xs font-medium px-2 py-0.5 rounded-full">
+                    {visita.motivo}
+                  </span>
+                ) : (
+                  <span className="text-gray-300">—</span>
+                )}
               </td>
               <td className="px-4 py-3 text-gray-600">{formatDate(visita.fecha)}</td>
               <td className="px-4 py-3 text-gray-600">{visita.hora}</td>

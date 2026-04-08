@@ -28,9 +28,9 @@ export async function createTratamientoAction(
   formData: FormData
 ): Promise<FormState> {
   const rawData = {
-    visitaId: Number(formData.get("visitaId")),
-    fechaInicio: formData.get("fechaInicio") as string,
-    fechaFin: formData.get("fechaFin") as string,
+    visitaId: formData.get("visitaId"),
+    fechaInicio: formData.get("fechaInicio"),
+    fechaFin: formData.get("fechaFin"),
   };
 
   const validation = createTratamientoSchema.safeParse(rawData);
@@ -57,15 +57,15 @@ export async function updateTratamientoAction(
   _prevState: FormState | null,
   formData: FormData
 ): Promise<FormState> {
-  const id = Number(formData.get("tratamientoId"));
+  const id = String(formData.get("tratamientoId") ?? "");
   const rawData = {
     tratamientoId: id,
-    visitaId: Number(formData.get("visitaId")),
-    fechaInicio: formData.get("fechaInicio") as string,
-    fechaFin: formData.get("fechaFin") as string,
+    visitaId: formData.get("visitaId"),
+    fechaInicio: formData.get("fechaInicio"),
+    fechaFin: formData.get("fechaFin"),
   };
 
-  if (isNaN(id) || id <= 0) {
+  if (!id) {
     return { success: false, message: "ID inválido" };
   }
 
